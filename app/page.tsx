@@ -1,6 +1,6 @@
 import { LogForm } from "./log-form";
 import { Logs } from "./logs";
-export function getStartOfTodayTimestamp() {
+function getStartOfTodayTimestamp() {
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Set to 00:00:00.000
   return today.getTime(); // Returns milliseconds since epoch
