@@ -1,6 +1,4 @@
 "use client";
-import Image from "next/image";
-import { LogForm } from "./log-form";
 import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 export function getStartOfTodayTimestamp() {
