@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/table";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
-import { remove } from "@/convex/logs";
 import { useMutation, useQuery } from "convex/react";
 import { Trash } from "lucide-react";
 function getStartOfTodayTimestamp() {
