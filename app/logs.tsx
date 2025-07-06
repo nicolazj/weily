@@ -1,6 +1,19 @@
 "use client";
-import { useQuery } from "convex/react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { remove } from "@/convex/logs";
+import { useMutation, useQuery } from "convex/react";
+import { Trash } from "lucide-react";
 function getStartOfTodayTimestamp() {
   const today = new Date();
   today.setHours(0, 0, 0, 0); // Set to 00:00:00.000
@@ -8,14 +21,50 @@ function getStartOfTodayTimestamp() {
 }
 
 export const Logs = () => {
+  const removeLog = useMutation(api.logs.remove);
+
   const logs = useQuery(api.logs.get, {
     timestamp: getStartOfTodayTimestamp(),
   });
+  const onDelete = (id: Id<"logs">) => {
+    removeLog({ id });
+  };
   return (
-    <div>
-      {logs?.map((log) => {
-        return <div key={log._id}>{JSON.stringify(log, null, 2)}</div>;
-      })}
-    </div>
+    <Table className="w-full">
+      <TableHeader>
+        <TableRow>
+          <TableHead className="w-[100px]">Workout</TableHead>
+          <TableHead>Weight</TableHead>
+          <TableHead>Reps</TableHead>
+          <TableHead className="text-right">time</TableHead>
+          <TableHead className="text-right w-[32px]"></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {logs?.map((log) => {
+          return (
+            <TableRow key={log._id}>
+              <TableCell className="font-medium">
+                <Badge>{log.type}</Badge>
+              </TableCell>
+              <TableCell>{log.weight}</TableCell>
+              <TableCell>{log.reps}</TableCell>
+              <TableCell className="text-right">
+                {new Date(log._creationTime).toLocaleTimeString()}
+              </TableCell>
+              <TableCell className="text-right w-[32px]">
+                <Button
+                  onClick={() => onDelete(log._id)}
+                  size={"icon"}
+                  variant={"ghost"}
+                >
+                  <Trash />
+                </Button>
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 };

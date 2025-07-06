@@ -22,3 +22,9 @@ export const add = mutation({
     return await ctx.db.insert("logs", args);
   },
 });
+export const remove = mutation({
+  args: { id: v.id("logs") },
+  handler: async (ctx, args) => {
+    return await ctx.db.delete(args.id);
+  },
+});
