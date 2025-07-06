@@ -82,6 +82,8 @@ export const getReportStats = query({
     }, {} as Record<string, number>);
 
     return {
+      firstOne: allLogs[0],
+      lastOne: allLogs[allLogs.length - 1],
       totalSessions: allLogs.length,
       totalVolume,
       avgVolume: uniqueDays > 0 ? Math.round(totalVolume / uniqueDays) : 0,

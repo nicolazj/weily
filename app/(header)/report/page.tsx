@@ -19,7 +19,11 @@ export default function Report() {
     <div className="m-4 space-y-6 font-[family-name:var(--font-geist-sans)]">
       <div className="flex items-center gap-2 mb-6">
         <Trophy className="h-6 w-6" />
-        <h1 className="text-2xl font-bold">Workout Report</h1>
+        <h1 className="text-2xl font-bold">
+          Workout Report{" "}
+          {new Date(stats.firstOne?._creationTime).toLocaleDateString()}-
+          {new Date(stats.lastOne?._creationTime).toLocaleDateString()}
+        </h1>
       </div>
 
       {/* Main Stats Grid */}
