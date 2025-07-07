@@ -21,8 +21,8 @@ export default function Report() {
         <Trophy className="h-6 w-6" />
         <h1 className="text-2xl font-bold">
           Workout Report{" "}
-          {new Date(stats.firstOne?._creationTime!).toLocaleDateString()}-
-          {new Date(stats.lastOne?._creationTime!).toLocaleDateString()}
+          {new Date(stats.firstOne?._creationTime).toLocaleDateString()}-
+          {new Date(stats.lastOne?._creationTime).toLocaleDateString()}
         </h1>
       </div>
 
