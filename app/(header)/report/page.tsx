@@ -42,15 +42,30 @@ const getStats = (
   ).size;
 
   // Get exercise frequency
-  const exerciseCount = filteredLogs.reduce((acc, log) => {
-    acc[log.type] = (acc[log.type] || 0) + 1;
+  const exerciseCount = allLogs.reduce((acc, log) => {
+    if (!(log.type in acc)) {
+      acc[log.type] = [0, 0, 0];
+    }
+    if (log.reps > 1) {
+      acc[log.type][0] = (acc[log.type][0] || 0) + 1;
+      if (log.weight > acc[log.type][1]) {
+        acc[log.type][1] = log.weight;
+      }
+    }
+    if (log.weight > acc[log.type][2]) {
+      acc[log.type][2] = log.weight;
+    }
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, [number, number, number]>);
 
   const topExercises = Object.entries(exerciseCount)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 5)
-    .map(([exercise, count]) => ({ exercise, count }));
+    .sort(([, [a]], [, [b]]) => b - a)
+    .map(([exercise, [count, weight, max]]) => ({
+      exercise,
+      count,
+      weight,
+      max,
+    }));
 
   return {
     firstOne: allLogs[0],
@@ -178,6 +193,32 @@ export default function Report() {
                   </div>
                   <span className="text-sm text-gray-600">
                     {exercise.count} sets
+                  </span>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-sm">No exercises logged yet</p>
+            )}
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <h3 className="text-lg font-semibold mb-4">Top Exercises #2</h3>
+          <div className="space-y-2">
+            {stats.topExercises.length > 0 ? (
+              stats.topExercises.map((exercise, index) => (
+                <div
+                  key={exercise.exercise}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-500">
+                      #{index + 1}
+                    </span>
+                    <Badge variant="outline">{exercise.exercise}</Badge>
+                  </div>
+                  <span className="text-sm text-gray-600">
+                    {exercise.weight}KG/{exercise.max} KG @
+                    {((exercise.weight / exercise.max) * 100).toFixed(1)}%
                   </span>
                 </div>
               ))
