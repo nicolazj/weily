@@ -1,19 +1,80 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { Activity, Calendar, Target, Trophy, TrendingUp } from "lucide-react";
 
-export default function Report() {
-  const stats = useQuery(api.logs.getReportStats);
+const getStats = (
+  allLogs: {
+    _id: Id<"logs">;
+    _creationTime: number;
+    weight: number;
+    reps: number;
+    type: string;
+  }[]
+) => {
+  if (allLogs.length === 0) {
+    return {
+      totalSessions: 0,
+      totalVolume: 0,
+      avgVolume: 0,
+      uniqueDays: 0,
+      totalReps: 0,
+      avgReps: 0,
+      topExercises: [],
+      recentActivity: [],
+    };
+  }
 
-  if (!stats) {
+  const totalVolume = allLogs.reduce(
+    (sum, log) => sum + log.weight * log.reps,
+    0
+  );
+
+  const filteredLogs = allLogs.filter((log) => log.reps > 1);
+
+  const totalReps = filteredLogs.reduce((sum, log) => sum + log.reps, 0);
+
+  // Get unique days
+  const uniqueDays = new Set(
+    filteredLogs.map((log) => new Date(log._creationTime).toDateString())
+  ).size;
+
+  // Get exercise frequency
+  const exerciseCount = filteredLogs.reduce((acc, log) => {
+    acc[log.type] = (acc[log.type] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const topExercises = Object.entries(exerciseCount)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5)
+    .map(([exercise, count]) => ({ exercise, count }));
+
+  return {
+    firstOne: allLogs[0],
+    lastOne: allLogs[allLogs.length - 1],
+    totalSessions: filteredLogs.length,
+    totalVolume,
+    avgVolume: uniqueDays > 0 ? Math.round(totalVolume / uniqueDays) : 0,
+    uniqueDays,
+    totalReps,
+    avgReps: Math.round(totalReps / filteredLogs.length),
+    topExercises,
+  };
+};
+export default function Report() {
+  const allLogs = useQuery(api.logs.get, {});
+
+  if (!allLogs) {
     return (
       <div className="m-4 items-center justify-items-center font-[family-name:var(--font-geist-sans)]">
         <div className="animate-pulse">Loading report...</div>
       </div>
     );
   }
+  const stats = getStats(allLogs);
 
   return (
     <div className="m-4 space-y-6 font-[family-name:var(--font-geist-sans)]">
@@ -31,20 +92,19 @@ export default function Report() {
         <div className="bg-white p-6 rounded-lg shadow-sm border">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">Total sets</p>
-              <p className="text-2xl font-bold">{stats.totalSessions}</p>
-            </div>
-            <Target className="h-8 w-8 text-blue-500" />
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-lg shadow-sm border">
-          <div className="flex items-center justify-between">
-            <div>
               <p className="text-sm text-gray-600">Training Days</p>
               <p className="text-2xl font-bold">{stats.uniqueDays}</p>
             </div>
             <Calendar className="h-8 w-8 text-green-500" />
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-lg shadow-sm border">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">Total sets</p>
+              <p className="text-2xl font-bold">{stats.totalSessions}</p>
+            </div>
+            <Target className="h-8 w-8 text-blue-500" />
           </div>
         </div>
 
@@ -126,53 +186,6 @@ export default function Report() {
             )}
           </div>
         </div>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <h3 className="text-lg font-semibold mb-4">
-          Recent Activity (Last 7 Days)
-        </h3>
-        {stats.recentActivity.length > 0 ? (
-          <div className="space-y-2">
-            {stats.recentActivity.map((activity) => (
-              <div
-                key={activity.day}
-                className="flex justify-between items-center"
-              >
-                <span className="text-sm text-gray-600">
-                  {new Date(activity.day).toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </span>
-                <div className="flex items-center gap-2">
-                  <div className="w-32 bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-500 h-2 rounded-full"
-                      style={{
-                        width: `${Math.min(
-                          100,
-                          (activity.volume /
-                            Math.max(
-                              ...stats.recentActivity.map((a) => a.volume)
-                            )) *
-                            100
-                        )}%`,
-                      }}
-                    />
-                  </div>
-                  <span className="text-sm font-medium">
-                    {activity.volume} KG
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-gray-500 text-sm">No recent activity</p>
-        )}
       </div>
     </div>
   );
