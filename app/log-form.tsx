@@ -81,7 +81,7 @@ export const LogForm = () => {
   return (
     <Drawer open={open} onOpenChange={setOpen} direction="top">
       <DrawerTrigger asChild>
-        <Button className="fixed top-0  right-0 m-2">log</Button>
+        <Button className="fixed top-0  right-0 m-2 z-50">log</Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>

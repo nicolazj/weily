@@ -38,7 +38,7 @@ export default function Layout({
                 asChild
                 className={navigationMenuTriggerStyle()}
               >
-                <Link href="/docs">Docs</Link>
+                <Link href="/days">Days</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
           </NavigationMenuList>

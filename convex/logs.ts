@@ -10,6 +10,9 @@ export const get = query({
       return await ctx.db
         .query("logs")
         .filter((q) => q.gte(q.field("_creationTime"), args.timestamp!))
+        .filter((q) =>
+          q.lt(q.field("_creationTime"), args.timestamp! + 24 * 60 * 60 * 1000)
+        )
         .collect();
     }
     return await ctx.db.query("logs").collect();

@@ -19,12 +19,18 @@ function getStartOfTodayTimestamp() {
   return today.getTime(); // Returns milliseconds since epoch
 }
 
-export const Logs = () => {
+function getStartOfTimestamp(date: Date) {
+  date.setHours(0, 0, 0, 0); // Set to 00:00:00.000
+  return date.getTime(); // Returns milliseconds since epoch
+}
+export const Logs = ({ date }: { date?: Date }) => {
   const removeLog = useMutation(api.logs.remove);
 
+  console.log({ date });
   const logs = useQuery(api.logs.get, {
-    timestamp: getStartOfTodayTimestamp(),
+    timestamp: date ? getStartOfTimestamp(date) : getStartOfTodayTimestamp(),
   });
+  console.log(logs);
   const onDelete = (id: Id<"logs">) => {
     removeLog({ id });
   };
