@@ -46,7 +46,7 @@ export const Logs = ({ date }: { date?: Date }) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {logs?.map((log) => {
+        {[...(logs ?? [])].reverse().map((log) => {
           return (
             <TableRow key={log._id}>
               <TableCell className="font-medium">
