@@ -51,7 +51,7 @@ export const LogForm = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       type: "",
-      weight: 80,
+      weight: 70,
       reps: 1,
     },
   });
@@ -79,7 +79,7 @@ export const LogForm = () => {
     await addLog(values);
     form.reset({
       type: values.type,
-      weight: 80,
+      weight: 70,
       reps: 1,
     });
   }
