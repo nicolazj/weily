@@ -22,18 +22,6 @@ import {
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { useState } from "react";
-
 const workoutTypes = [
   { value: "squat", label: "Squat" },
   { value: "bench-press", label: "Bench Press" },
@@ -61,7 +49,6 @@ const formSchema = z.object({
 });
 
 export const LogForm = () => {
-  const [open, setOpen] = useState(false);
   const addLog = useMutation(api.logs.add);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -72,88 +59,79 @@ export const LogForm = () => {
       reps: 1,
     },
   });
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    addLog(values);
-    form.reset();
-    setOpen(false);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    await addLog(values);
+    form.reset({
+      type: "",
+      weight: 80,
+      reps: 1,
+    });
   }
 
   return (
-    <Drawer open={open} onOpenChange={setOpen} direction="top">
-      <DrawerTrigger asChild>
-        <Button className="fixed top-0  right-0 m-2 z-50">log</Button>
-      </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader>
-          <DrawerTitle>log</DrawerTitle>
-          <DrawerDescription>log your workout</DrawerDescription>
-        </DrawerHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="m-8">
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Workout</FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {workoutTypes.map((wk) => (
-                          <SelectItem value={wk.value} key={wk.value}>
-                            {wk.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="weight"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Weight</FormLabel>
-                  <FormControl>
-                    <Input placeholder="80" {...field} />
-                  </FormControl>
+    <div className="w-full rounded-lg border p-4 mb-4">
+      <h2 className="text-lg font-semibold mb-1">Add new log</h2>
+      <p className="text-sm text-muted-foreground mb-4">Log your workout</p>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Workout</FormLabel>
+                <FormControl>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {workoutTypes.map((wk) => (
+                        <SelectItem value={wk.value} key={wk.value}>
+                          {wk.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="weight"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Weight</FormLabel>
+                <FormControl>
+                  <Input placeholder="80" {...field} />
+                </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="reps"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Reps</FormLabel>
-                  <FormControl>
-                    <Input placeholder="8" {...field} />
-                  </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="reps"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Reps</FormLabel>
+                <FormControl>
+                  <Input placeholder="8" {...field} />
+                </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* <Button type="submit">Log</Button> */}
-            <DrawerFooter>
-              <Button>Log</Button>
-              <DrawerClose asChild>
-                <Button variant="outline" type="button" className="w-full">
-                  Cancel
-                </Button>
-              </DrawerClose>
-            </DrawerFooter>
-          </form>
-        </Form>
-      </DrawerContent>
-    </Drawer>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type="submit" className="w-full">
+            Add log
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };
