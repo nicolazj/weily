@@ -10,16 +10,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "convex/react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 
 const workoutTypes = [
@@ -30,8 +24,10 @@ const workoutTypes = [
   { value: "dip", label: "Dip" },
 ] as const;
 
+const STORAGE_KEY = "weily:lastWorkoutType";
+
 const formSchema = z.object({
-  type: z.string().min(1),
+  type: z.string().min(1, "Please choose a workout type"),
   weight: z.coerce
     .number({
       required_error: "Weight is required",
@@ -60,10 +56,29 @@ export const LogForm = () => {
     },
   });
 
+  const selectedType = form.watch("type");
+
+  useEffect(() => {
+    const savedType = localStorage.getItem(STORAGE_KEY);
+    if (
+      savedType &&
+      workoutTypes.some((wk) => wk.value === savedType) &&
+      !form.getValues("type")
+    ) {
+      form.setValue("type", savedType, { shouldValidate: true });
+    }
+  }, [form]);
+
+  useEffect(() => {
+    if (selectedType) {
+      localStorage.setItem(STORAGE_KEY, selectedType);
+    }
+  }, [selectedType]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await addLog(values);
     form.reset({
-      type: "",
+      type: values.type,
       weight: 80,
       reps: 1,
     });
@@ -82,18 +97,19 @@ export const LogForm = () => {
               <FormItem>
                 <FormLabel>Workout</FormLabel>
                 <FormControl>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {workoutTypes.map((wk) => (
-                        <SelectItem value={wk.value} key={wk.value}>
-                          {wk.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {workoutTypes.map((wk) => (
+                      <Button
+                        key={wk.value}
+                        type="button"
+                        variant={field.value === wk.value ? "default" : "outline"}
+                        onClick={() => field.onChange(wk.value)}
+                        className="w-full"
+                      >
+                        {wk.label}
+                      </Button>
+                    ))}
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
