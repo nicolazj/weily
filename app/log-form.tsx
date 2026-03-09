@@ -85,11 +85,11 @@ export const LogForm = () => {
   }
 
   return (
-    <div className="w-full rounded-lg border p-4 mb-4">
-      <h2 className="text-lg font-semibold mb-1">Add new log</h2>
-      <p className="text-sm text-muted-foreground mb-4">Log your workout</p>
+    <div className="w-full rounded-lg border p-3 mb-3">
+      <h2 className="text-base font-semibold mb-0.5">Add new log</h2>
+      <p className="text-xs text-muted-foreground mb-2">Log your workout</p>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
           <FormField
             control={form.control}
             name="type"
@@ -97,14 +97,14 @@ export const LogForm = () => {
               <FormItem>
                 <FormLabel>Workout</FormLabel>
                 <FormControl>
-                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                  <div className="grid grid-cols-3 gap-1.5 sm:grid-cols-5">
                     {workoutTypes.map((wk) => (
                       <Button
                         key={wk.value}
                         type="button"
                         variant={field.value === wk.value ? "default" : "outline"}
                         onClick={() => field.onChange(wk.value)}
-                        className="w-full"
+                        className="w-full h-8 text-xs px-2"
                       >
                         {wk.label}
                       </Button>
@@ -115,35 +115,37 @@ export const LogForm = () => {
               </FormItem>
             )}
           />
-          <FormField
-            control={form.control}
-            name="weight"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Weight</FormLabel>
-                <FormControl>
-                  <Input placeholder="80" {...field} />
-                </FormControl>
+          <div className="grid grid-cols-2 gap-2">
+            <FormField
+              control={form.control}
+              name="weight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Weight</FormLabel>
+                  <FormControl>
+                    <Input placeholder="80" {...field} className="h-9" />
+                  </FormControl>
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="reps"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Reps</FormLabel>
-                <FormControl>
-                  <Input placeholder="8" {...field} />
-                </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="reps"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Reps</FormLabel>
+                  <FormControl>
+                    <Input placeholder="8" {...field} className="h-9" />
+                  </FormControl>
 
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" className="w-full">
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+          <Button type="submit" className="w-full h-9">
             Add log
           </Button>
         </form>
