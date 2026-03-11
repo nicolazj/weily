@@ -24,7 +24,9 @@ const workoutTypes = [
   { value: "dip", label: "Dip" },
 ] as const;
 
-const STORAGE_KEY = "weily:lastWorkoutType";
+const TYPE_STORAGE_KEY = "weily:lastWorkoutType";
+const WEIGHT_STORAGE_KEY = "weily:lastWeight";
+const REPS_STORAGE_KEY = "weily:lastReps";
 
 const formSchema = z.object({
   type: z.string().min(1, "Please choose a workout type"),
@@ -57,9 +59,14 @@ export const LogForm = () => {
   });
 
   const selectedType = form.watch("type");
+  const selectedWeight = form.watch("weight");
+  const selectedReps = form.watch("reps");
 
   useEffect(() => {
-    const savedType = localStorage.getItem(STORAGE_KEY);
+    const savedType = localStorage.getItem(TYPE_STORAGE_KEY);
+    const savedWeight = localStorage.getItem(WEIGHT_STORAGE_KEY);
+    const savedReps = localStorage.getItem(REPS_STORAGE_KEY);
+
     if (
       savedType &&
       workoutTypes.some((wk) => wk.value === savedType) &&
@@ -67,21 +74,37 @@ export const LogForm = () => {
     ) {
       form.setValue("type", savedType, { shouldValidate: true });
     }
+
+    if (savedWeight && !Number.isNaN(Number(savedWeight))) {
+      form.setValue("weight", Number(savedWeight), { shouldValidate: true });
+    }
+
+    if (savedReps && !Number.isNaN(Number(savedReps))) {
+      form.setValue("reps", Number(savedReps), { shouldValidate: true });
+    }
   }, [form]);
 
   useEffect(() => {
     if (selectedType) {
-      localStorage.setItem(STORAGE_KEY, selectedType);
+      localStorage.setItem(TYPE_STORAGE_KEY, selectedType);
     }
   }, [selectedType]);
 
+  useEffect(() => {
+    if (typeof selectedWeight === "number" && !Number.isNaN(selectedWeight)) {
+      localStorage.setItem(WEIGHT_STORAGE_KEY, String(selectedWeight));
+    }
+  }, [selectedWeight]);
+
+  useEffect(() => {
+    if (typeof selectedReps === "number" && !Number.isNaN(selectedReps)) {
+      localStorage.setItem(REPS_STORAGE_KEY, String(selectedReps));
+    }
+  }, [selectedReps]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     await addLog(values);
-    form.reset({
-      type: values.type,
-      weight: 70,
-      reps: 1,
-    });
+    form.reset(values);
   }
 
   return (
